@@ -23,8 +23,8 @@ if (interactive()) {
         uiOutput("droplistx"),
         uiOutput("droplisty"),
         textInput(inputId="title", label="Title", value = "", width = NULL, placeholder = NULL),
-        textInput(inputId="pcut", label="-log10(p-value) cutoff (>)", value = 10, width = NULL, placeholder = 10),
-        textInput(inputId="fccut", label="foldchange cutoff (>)", value = 10, width = NULL, placeholder = 10),
+        textInput(inputId="pcut", label="-log10(p-value) cutoff (>)", value = NULL, width = NULL, placeholder = 'cannot adjust yet'),
+        textInput(inputId="fccut", label="foldchange cutoff (>)", value = NULL, width = NULL, placeholder = 'cannot adjust yet'),
         uiOutput("droplistlab"),
         downloadButton('filename', "Download")
         
@@ -65,20 +65,20 @@ if (interactive()) {
     output$droplistx <- renderUI({
       
       
-      selectInput(inputId="fccol", label="select foldchange column", choices=clist(), selected = NULL, multiple = FALSE,
+      selectInput(inputId="fccol", label="select foldchange column", choices=clist(), selected = clist()[[1]], multiple = FALSE,
                   selectize = TRUE, width = NULL, size = NULL)
     })
     
     output$droplisty <- renderUI({
       
       
-      selectInput(inputId="pcol", label="select p-value column", choices=clist(), selected = NULL, multiple = FALSE,
+      selectInput(inputId="pcol", label="select p-value column", choices=clist(), selected = clist()[[2]], multiple = FALSE,
                   selectize = TRUE, width = NULL, size = NULL)
     })
     output$droplistlab <- renderUI({
       
       
-      selectInput(inputId="labelcol", label="select column for datapoint labels", choices=clist(), selected = NULL, multiple = FALSE,
+      selectInput(inputId="labelcol", label="select column for datapoint labels", choices=clist(), selected = clist()[[3]], multiple = FALSE,
                   selectize = TRUE, width = NULL, size = NULL)
     })
     
