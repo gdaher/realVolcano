@@ -23,8 +23,8 @@ if (interactive()) {
         uiOutput("droplistx"),
         uiOutput("droplisty"),
         textInput(inputId="title", label="Title", value = "", width = NULL, placeholder = NULL),
-        textInput(inputId="pcut", label="-log10(p-value) cutoff (>)", value = NULL, width = NULL, placeholder = 'cannot adjust yet'),
-        textInput(inputId="fccut", label="foldchange cutoff (>)", value = NULL, width = NULL, placeholder = 'cannot adjust yet'),
+        numericInput(inputId="pcut", label="-log10(p-value) cutoff (>)", value = 10, width = NULL),
+        numericInput(inputId="fccut", label="foldchange cutoff (>)", value = 0.0, width = NULL),
         uiOutput("droplistlab"),
         downloadButton('filename', "Download")
         
@@ -91,9 +91,12 @@ if (interactive()) {
       df<-read.xlsx(xlsxFile = inFile()$datapath,sheet = 1)
       df['negativelog10p']<- -log10(df[input$pcol])
       nameColumn <- input$labelcol
-      pCutoff <- input$pcut
-      pCol <- input$pcol
-      df[df$negativelog10p < 10, nameColumn] <- ''
+      foldchangeCol <- input$fccol
+     
+      df[df$negativelog10p < input$pcut , nameColumn] <- ''
+      df[df$foldchangeCol > input$fccut , nameColumn] <- ''
+      
+      
       df
     })
     
@@ -174,7 +177,8 @@ if (interactive()) {
     output$test <-renderText({
     if  (is.null(inFile()))
       NULL
-    ma<-sum(Data()[[input$labelcol]]!="")
+    foldchangeCol <- input$fccol
+    ma<-typeof(input$fccut)
     ma  
     })  
     
