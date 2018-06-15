@@ -11,7 +11,7 @@ if (interactive()) {
   ui <- fluidPage(
     sidebarLayout(
       sidebarPanel(
-        fileInput("file1", "Choose CSV File",
+        fileInput("file1", "Upload your .xlsx File",
                   accept = c(
                     "text/csv",
                     "text/comma-separated-values,text/plain",
@@ -24,7 +24,7 @@ if (interactive()) {
         uiOutput("droplisty"),
         textInput(inputId="title", label="Title", value = "", width = NULL, placeholder = NULL),
         numericInput(inputId="pcut", label="-log10(p-value) cutoff (>)", value = 10, width = NULL),
-        numericInput(inputId="fccut", label="foldchange cutoff (>)", value = 0.0, width = NULL),
+        numericInput(inputId="fccut", label="foldchange cutoff (<,>)", value = 0.0, width = NULL),
         uiOutput("droplistlab"),
         downloadButton('filename', "Download")
         
@@ -94,8 +94,19 @@ if (interactive()) {
       foldchangeCol <- input$fccol
      
       df[df$negativelog10p < input$pcut , nameColumn] <- ''
-      df[df$foldchangeCol > input$fccut , nameColumn] <- ''
+      df[abs(df[,foldchangeCol]) < input$fccut , nameColumn] <- ''
       
+     
+      ##order data frame by p-value
+      df[order('negativelog10p'),]
+   
+      ##only take top 50 by p-value, and give warning message if goes outside 
+      top50 <- grep(pattern = "[^''\b]", x = df[,input$labelcol])
+      if(length(top50) > 50) {
+        
+        df[top50[51:length((top50))],input$labelcol] <- ''
+        
+      }
       
       df
     })
@@ -151,7 +162,7 @@ if (interactive()) {
       if(is.null(Data()))
         return(NULL)
       ggplot(Data(), aes_string(x = fc(), y = p10))+ #abs(Data()[[fc()]])>fccut()
-        geom_point() +geom_text_repel(data=Data(),aes_string(label=input$labelcol))+
+        geom_point() +geom_text_repel(data=Data(),aes_string(label=input$labelcol),min.segment.length = 0)+
         ggtitle(title())+ 
         labs(y = ylabel())+
         theme(plot.title = element_text(hjust = 0.5))})
@@ -177,9 +188,11 @@ if (interactive()) {
     output$test <-renderText({
     if  (is.null(inFile()))
       NULL
-    foldchangeCol <- input$fccol
-    ma<-typeof(input$fccut)
-    ma  
+    a <- Data()[,input$labelcol]
+     d <-  grep(pattern = "[^''\b]", x = a)
+    length(d);
+    
+     
     })  
     
   }
